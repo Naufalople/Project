@@ -303,17 +303,9 @@ int main(){
             break;
 
         case 5:
-            char nama_pasien[100];
-            cout << "Masukkan nama pasien yang ingin dihapus: ";
-            cin.getline(nama_pasien, 100);
-            hapus_pasien(nama_pasien);
             break;
 
         case 6:
-            char nama_dokter[100];
-            cout << "Masukkan nama pasien yang ingin dihapus: ";
-            cin.getline(nama_dokter, 100);
-            hapus_dokter(nama_dokter);
             break;
 
         case 7:
