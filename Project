@@ -691,11 +691,9 @@ int main(){
         {
         case 1:
             if (kepalapasien != NULL)
-            {
-                cout << "Linked list sudah di buat" << endl ;
+                {cout << "Linked list sudah di buat" << endl ;
                 cin.get();
-                break;
-            }
+                break;}
             cout << "nama pasien: ";
             cin.getline(nama_pasien, 100);
             cout << "keluhan pasien: ";
@@ -715,11 +713,9 @@ int main(){
 
         case 2:
         if (kepaladokter != NULL)
-        {
-            cout << "Linked list sudah di buat" << endl ;
+            {cout << "Linked list sudah di buat" << endl ;
             cin.get();
-            break;
-        }
+            break;}
         cout << "nama dokter: ";
         cin.getline(nama_dokter, 100);
         cout << "spesialis dokter: ";
@@ -750,11 +746,8 @@ int main(){
             cin >> tgl_pasien;
             cin.ignore();
             if (tambahakhir_pasien(nama_pasien, keluhan, umur_pasien, id_pasien, tgl_pasien))
-            {
-                simpanpasienkefile();
-            }
+            {simpanpasienkefile();}
             break;
-
         case 4:
             cout << "nama dokter: ";
             cin.getline(nama_dokter, 100);
@@ -769,33 +762,27 @@ int main(){
             if (tambahakhir_dokter(nama_dokter, spesialis, umur_dokter, id_dokter, tgl_dokter)){
                 simpandokterkefile();}
             break;
-
         case 5:
-            break;
             cout << "Masukkan nama pasien yang ingin dihapus: ";
             cin.getline(nama_pasien, 100);
             hapus_pasien(nama_pasien);
             break;
         case 6:
-            break;
             cout << "Masukkan nama dokter yang ingin dihapus: ";
             cin.getline(nama_dokter, 100);
             hapus_dokter(nama_dokter);
             break;
         case 7:
-            break;
             cout << "Masukkan nama pasien yang ingin dicari: ";
             cin.getline(nama_pasien, 100);
             cari_pasien(nama_pasien);
             break;
         case 8:
-            break;
             cout << "Masukkan nama dokter yang ingin dicari: ";
             cin.getline(nama_dokter, 100);
             cari_dokter(nama_dokter);
             break;
         case 9:
-            break;
             kunjungan();
             break;
         case 10:
