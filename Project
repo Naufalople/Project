@@ -999,5 +999,5 @@ int main(){
         cin.get();
             break;
         }
-    } while (pilih != 11);
+    } while (pilih != 13);
 }
