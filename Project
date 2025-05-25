@@ -982,7 +982,7 @@ int main(){
             tampilkandata();
             break;
         case 10:
-            cout << "Masukkan nama pasien yang ingin diedit keluhannya: ";
+            cout << "Masukkan nama pasien yang ingin diedit datanya: ";
             cin.getline(nama_pasien, 100);
             edit_pasien(nama_pasien);
             break;
