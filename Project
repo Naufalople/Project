@@ -472,14 +472,9 @@ void cari_pasien(char nama_pasien[100]) {
     }
     
     int hitung = 0;
-    while (hitung < jumlahPasien && fscanf(file, "%d|%[^|]|%d|%d|%[^\n]\n", 
-           &daftarPasien[hitung].id_pasien, 
-           daftarPasien[hitung].nama_pasien, 
-           &daftarPasien[hitung].umur_pasien, 
-           &daftarPasien[hitung].tgl_pasien, 
-           daftarPasien[hitung].keluhan) == 5) {
-        hitung++;
-    }
+    while (hitung < jumlahPasien && fscanf(file, "%d|%[^|]|%d|%d|%[^\n]\n", &daftarPasien[hitung].id_pasien, daftarPasien[hitung].nama_pasien, 
+           &daftarPasien[hitung].umur_pasien, &daftarPasien[hitung].tgl_pasien, daftarPasien[hitung].keluhan) == 5) {
+        hitung++;}
     fclose(file);
     
     cout << endl << "======= Hasil Pencarian Pasien =======" << endl;
@@ -487,7 +482,7 @@ void cari_pasien(char nama_pasien[100]) {
     
     bool ditemukan = false;
     for (int i = 0; i < jumlahPasien; i++) {
-        if (strcmp(daftarPasien[i].nama_pasien, nama_pasien) == 0) {
+        if (strstr(daftarPasien[i].nama_pasien, nama_pasien) != NULL) {
             ditemukan = true;
             cout << "ID: " << daftarPasien[i].id_pasien << endl;
             cout << "Nama: " << daftarPasien[i].nama_pasien << endl;
@@ -562,7 +557,7 @@ void cari_dokter(char nama_dokter[100]) {
     
     bool ditemukan = false;
     for (int i = 0; i < jumlahDokter; i++) {
-        if (strcmp(daftarDokter[i].nama_dokter, nama_dokter) == 0) {
+        if (strstr(daftarDokter[i].nama_dokter, nama_dokter) != NULL) {
             ditemukan = true;
             cout << "ID: " << daftarDokter[i].id_dokter << endl;
             cout << "Nama: " << daftarDokter[i].nama_dokter << endl;
@@ -580,6 +575,202 @@ void cari_dokter(char nama_dokter[100]) {
     delete[] daftarDokter;
     
     cout << endl << "Tekan Enter untuk kembali ke menu...";
+    cin.get();
+}
+
+void edit_pasien(char nama_dicari[100]) {
+    system("cls");
+    bool ditemukan = false;
+
+    struct TempPasien {
+        int id_pasien, umur_pasien, tgl_pasien;
+        char nama_pasien[100], keluhan[50];
+    };
+
+    FILE *file = fopen("data_pasien.txt", "r");
+    if (file == NULL) {
+        cout << "Gagal membuka file data_pasien.txt!" << endl;
+        return;
+    }
+
+    int jumlah = 0;
+    char baris[256];
+    while (fgets(baris, sizeof(baris), file)) jumlah++;
+    rewind(file);
+
+    TempPasien *daftar = new TempPasien[jumlah];
+    int isi = 0;
+    while (fscanf(file, "%d|%[^|]|%d|%d|%[^\n]\n", &daftar[isi].id_pasien, daftar[isi].nama_pasien,
+                  &daftar[isi].umur_pasien, &daftar[isi].tgl_pasien, daftar[isi].keluhan) == 5) {
+        isi++;
+    }
+    fclose(file);
+
+    for (int i = 0; i < isi; i++) {
+        if (strstr(daftar[i].nama_pasien, nama_dicari) != NULL) {
+            ditemukan = true;
+            cout << "\nData lama untuk pasien: " << daftar[i].nama_pasien << endl;
+            cout << "ID: " << daftar[i].id_pasien << endl;
+            cout << "Umur: " << daftar[i].umur_pasien << endl;
+            cout << "Tanggal Datang: " << daftar[i].tgl_pasien << endl;
+            cout << "Keluhan: " << daftar[i].keluhan << endl;
+
+            cout << "\nMasukkan data baru:" << endl;
+            cout << "Nama: ";
+            cin.getline(daftar[i].nama_pasien, 100);
+
+            int id_baru;
+            bool id_sama;
+            do {
+                id_sama = false;
+                cout << "ID: ";
+                cin >> id_baru;
+                for (int k = 0; k < isi; k++) {
+                    if (k != i && daftar[k].id_pasien == id_baru) {
+                        cout << "Error: ID " << id_baru << " sudah digunakan pasien lain!\n";
+                        id_sama = true;
+                        break;
+                    }
+                }
+            } while (id_sama);
+            daftar[i].id_pasien = id_baru;
+
+            cout << "Umur: ";
+            cin >> daftar[i].umur_pasien;
+            cout << "Tanggal Datang: ";
+            cin >> daftar[i].tgl_pasien;
+            cin.ignore();
+            cout << "Keluhan: ";
+            cin.getline(daftar[i].keluhan, 50);
+        }
+    }
+
+    if (ditemukan) {
+        FILE *save = fopen("data_pasien.txt", "w");
+        if (save == NULL) {
+            cout << "Gagal menyimpan data!" << endl;
+            delete[] daftar;
+            return;
+        }
+
+        for (int i = 0; i < isi; i++) {
+            fprintf(save, "%d|%s|%d|%d|%s\n", daftar[i].id_pasien, daftar[i].nama_pasien,
+                    daftar[i].umur_pasien, daftar[i].tgl_pasien, daftar[i].keluhan);
+        }
+
+        fclose(save);
+        cout << "\nData pasien berhasil diperbarui.\n";
+
+        while (kepalapasien != NULL) {
+            pasien *hapus = kepalapasien;
+            kepalapasien = kepalapasien->next;
+            delete hapus;
+        }
+        loadpasiendarifile();
+    } else {
+        cout << "Pasien tidak ditemukan.\n";
+    }
+
+    delete[] daftar;
+    cout << "\nTekan Enter untuk kembali...";
+    cin.get();
+}
+
+void edit_dokter(char nama_dicari[100]) {
+    system("cls");
+    bool ditemukan = false;
+
+    struct TempDokter {
+        int id_dokter, umur_dokter, tgl_dokter;
+        char nama_dokter[100], spesialis[50];
+    };
+
+    FILE *file = fopen("data_dokter.txt", "r");
+    if (file == NULL) {
+        cout << "Gagal membuka file data_dokter.txt!" << endl;
+        return;
+    }
+
+    int jumlah = 0;
+    char baris[256];
+    while (fgets(baris, sizeof(baris), file)) jumlah++;
+    rewind(file);
+
+    TempDokter *daftar = new TempDokter[jumlah];
+    int isi = 0;
+    while (fscanf(file, "%d|%[^|]|%d|%d|%[^\n]\n", &daftar[isi].id_dokter, daftar[isi].nama_dokter,
+                  &daftar[isi].umur_dokter, &daftar[isi].tgl_dokter, daftar[isi].spesialis) == 5) {
+        isi++;
+    }
+    fclose(file);
+
+    for (int i = 0; i < isi; i++) {
+        if (strstr(daftar[i].nama_dokter, nama_dicari) != NULL) {
+            ditemukan = true;
+            cout << "\nData lama untuk dokter: " << daftar[i].nama_dokter << endl;
+            cout << "ID: " << daftar[i].id_dokter << endl;
+            cout << "Umur: " << daftar[i].umur_dokter << endl;
+            cout << "Tanggal Datang: " << daftar[i].tgl_dokter << endl;
+            cout << "Spesialis: " << daftar[i].spesialis << endl;
+
+            cout << "\nMasukkan data baru:" << endl;
+            cout << "Nama: ";
+            cin.getline(daftar[i].nama_dokter, 100);
+
+            int id_baru;
+            bool id_sama;
+            do {
+                id_sama = false;
+                cout << "ID: ";
+                cin >> id_baru;
+                for (int k = 0; k < isi; k++) {
+                    if (k != i && daftar[k].id_dokter == id_baru) {
+                        cout << "Error: ID " << id_baru << " sudah digunakan dokter lain!\n";
+                        id_sama = true;
+                        break;
+                    }
+                }
+            } while (id_sama);
+            daftar[i].id_dokter = id_baru;
+
+            cout << "Umur: ";
+            cin >> daftar[i].umur_dokter;
+            cout << "Tanggal Datang: ";
+            cin >> daftar[i].tgl_dokter;
+            cin.ignore();
+            cout << "Spesialis: ";
+            cin.getline(daftar[i].spesialis, 50);
+        }
+    }
+
+    if (ditemukan) {
+        FILE *save = fopen("data_dokter.txt", "w");
+        if (save == NULL) {
+            cout << "Gagal menyimpan data!" << endl;
+            delete[] daftar;
+            return;
+        }
+
+        for (int i = 0; i < isi; i++) {
+            fprintf(save, "%d|%s|%d|%d|%s\n", daftar[i].id_dokter, daftar[i].nama_dokter,
+                    daftar[i].umur_dokter, daftar[i].tgl_dokter, daftar[i].spesialis);
+        }
+
+        fclose(save);
+        cout << "\nData dokter berhasil diperbarui.\n";
+
+        while (kepaladokter != NULL) {
+            dokter *hapus = kepaladokter;
+            kepaladokter = kepaladokter->next;
+            delete hapus;
+        }
+        loaddokterdarifile();
+    } else {
+        cout << "Dokter tidak ditemukan.\n";
+    }
+
+    delete[] daftar;
+    cout << "\nTekan Enter untuk kembali...";
     cin.get();
 }
 
@@ -680,9 +871,11 @@ int main(){
         cout << "6. Hapus dokter" << endl;
         cout << "7. cari pasien" << endl;
         cout << "8. cari dokter" << endl;
-        cout << "9. list kunjungan" << endl;
-        cout << "10. tampilkan data" <<  endl;
-        cout << "11. keluar program" <<  endl;
+        cout << "9. tampilkan data" <<  endl;
+        cout << "10. edit pasien" <<  endl;
+        cout << "11. edit dokter" <<  endl;
+        cout << "12. list kunjungan" << endl;
+        cout << "13. keluar program" <<  endl;
         cout << "pilih menu: ";
         cin >> pilih;
         cin.ignore();
@@ -782,13 +975,23 @@ int main(){
             cin.getline(nama_dokter, 100);
             cari_dokter(nama_dokter);
             break;
-        case 9:
+        case 12:
             kunjungan();
             break;
-        case 10:
+        case 9:
             tampilkandata();
             break;
+        case 10:
+            cout << "Masukkan nama pasien yang ingin diedit keluhannya: ";
+            cin.getline(nama_pasien, 100);
+            edit_pasien(nama_pasien);
+            break;
         case 11:
+            cout << "Masukkan nama dokter yang ingin diedit datanya: ";
+            cin.getline(nama_dokter, 100);
+            edit_dokter(nama_dokter);
+            break;
+        case 13:
             cout << "keluar dari program" << endl;
             break;
         default:
